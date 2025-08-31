@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Encuesta</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-zinc-900 text-white min-h-screen flex items-center justify-center px-4 font-sans">
+
+  <main class="bg-zinc-800 p-8 rounded-3xl shadow-xl w-full max-w-xl space-y-6 text-center">
+    <h1 class="text-3xl font-bold">Encuesta de Evaluación</h1>
+
+    <div>
+      <p class="text-lg font-semibold">Materia: <span id="materia" class="text-blue-400"></span></p>
+      <p class="text-sm text-gray-300" id="fecha"></p>
+    </div>
+
+    <div id="preguntaContenedor" class="space-y-4">
+      <p id="pregunta" class="text-xl font-medium">Pregunta</p>
+
+      <div class="flex flex-col items-start space-y-2">
+        <label><input type="radio" name="respuesta" value="Si" class="mr-2"> Sí</label>
+        <label><input type="radio" name="respuesta" value="No" class="mr-2"> No</label>
+        <label><input type="radio" name="respuesta" value="Más o menos" class="mr-2"> Más o menos</label>
+      </div>
+    </div>
+
+    <div class="space-y-3">
+      <button id="btnSiguiente" onclick="siguientePregunta()" class="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded w-full font-semibold">
+        Siguiente
+      </button>
+
+      <button id="btnVerAnalisis" onclick="verAnalisis()" class="bg-green-600 hover:bg-green-700 px-6 py-3 rounded w-full font-semibold hidden">
+        Ver análisis
+      </button>
+    </div>
+  </main>
+
+  <script>
+    const materia = localStorage.getItem("materiaSeleccionada") || "Sin materia";
+    const fechaActual = new Date().toLocaleDateString('es-AR');
+
+    document.getElementById("materia").innerText = materia;
+    document.getElementById("fecha").innerText = `Fecha: ${fechaActual}`;
+
+    const preguntas = [
+      "¿Entendiste el tema?",
+      "¿Fue clara la explicación?",
+      "¿Pudiste hacer las actividades?",
+      "¿Te sentiste motivado?"
+    ];
+
+    let respuestas = [];
+    let indice = 0;
+
+    function mostrarPregunta() {
+      document.getElementById("pregunta").innerText = preguntas[indice];
+      document.querySelectorAll("input[name='respuesta']").forEach(r => r.checked = false);
+    }
+
+    function siguientePregunta() {
+      const seleccion = document.querySelector("input[name='respuesta']:checked");
+      if (!seleccion) {
+        alert("Por favor selecciona una respuesta.");
+        return;
+      }
+
+      respuestas.push(seleccion.value);
+      indice++;
+
+      if (indice >= preguntas.length) {
+        document.getElementById("preguntaContenedor").innerHTML = "<p class='text-xl font-bold'>¡Gracias por responder!</p>";
+        document.getElementById("btnSiguiente").classList.add("hidden");
+        document.getElementById("btnVerAnalisis").classList.remove("hidden");
+      } else {
+        mostrarPregunta();
+      }
+    }
+
+    function verAnalisis() {
+      const totalSi = respuestas.filter(r => r === "Si").length;
+
+      // Guardamos análisis y respuestas en localStorage
+      localStorage.setItem("respuestas", JSON.stringify(respuestas));
+      localStorage.setItem("totalSi", totalSi);
+      localStorage.setItem("preguntas", JSON.stringify(preguntas));
+
+      // Redirigimos a form4
+      window.location.href = "calificación.html"; // cambia el nombre si tu archivo es diferente
+    }
+
+    // Mostrar la primera pregunta al cargar
+    window.onload = mostrarPregunta;
+  </script>
+</body>
+</html>

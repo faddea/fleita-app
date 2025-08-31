@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Evaluación del Docente</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-zinc-900 text-white min-h-screen flex items-center justify-center px-4 font-sans">
+
+  <main class="bg-zinc-800 p-8 rounded-3xl shadow-xl w-full max-w-xl space-y-6 text-center">
+    <h1 class="text-3xl font-bold">Evaluación del Docente</h1>
+
+    <p class="text-lg font-semibold">Materia: <span id="materia" class="text-blue-400"></span></p>
+
+    <p class="text-lg">Califica al docente del 1 (muy malo) al 5 (excelente):</p>
+
+    <div id="opciones" class="flex justify-center gap-4 text-xl">
+      <label><input type="radio" name="puntaje" value="1" class="mr-1">1</label>
+      <label><input type="radio" name="puntaje" value="2" class="mr-1">2</label>
+      <label><input type="radio" name="puntaje" value="3" class="mr-1">3</label>
+      <label><input type="radio" name="puntaje" value="4" class="mr-1">4</label>
+      <label><input type="radio" name="puntaje" value="5" class="mr-1">5</label>
+    </div>
+
+    <div class="space-y-3 pt-4">
+      <button id="btnEnviar" onclick="enviarPuntaje()" class="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded w-full font-semibold">
+        Enviar
+      </button>
+
+      <button id="btnVolver" onclick="volver()" class="bg-yellow-600 hover:bg-yellow-700 px-6 py-3 rounded w-full font-semibold hidden">
+        Volver al Formulario
+      </button>
+
+      <button id="btnSalir" onclick="cerrarVentana()" class="bg-red-600 hover:bg-red-700 px-6 py-3 rounded w-full font-semibold hidden">
+        Salir
+      </button>
+    </div>
+  </main>
+
+  <script>
+    // Mostrar materia desde localStorage
+    const materia = localStorage.getItem("materiaSeleccionada") || "Sin materia";
+    document.getElementById("materia").innerText = materia;
+
+    function enviarPuntaje() {
+      const seleccion = document.querySelector("input[name='puntaje']:checked");
+      if (!seleccion) {
+        alert("Por favor selecciona un puntaje.");
+        return;
+      }
+
+      const puntaje = seleccion.value;
+      alert("Puntaje enviado: " + puntaje);
+
+      // Guardamos el puntaje en localStorage (puedes enviarlo a servidor si deseas)
+      localStorage.setItem("evaluacionDocente", puntaje);
+
+      // Ocultamos botón Enviar, mostramos otros
+      document.getElementById("btnEnviar").classList.add("hidden");
+      document.getElementById("btnVolver").classList.remove("hidden");
+      document.getElementById("btnSalir").classList.remove("hidden");
+    }
+
+    function volver() {
+      window.location.href = "menu.html"; // Cambia esto por la página correcta si es otra
+    }
+
+    function cerrarVentana() {
+      // En navegadores, no se puede cerrar una ventana que no fue abierta por script
+      alert("Gracias por participar. Puedes cerrar la pestaña.");
+      window.location.href = "index.html"; // Cambia esto por la página correcta si es otra
+
+    }
+  </script>
+</body>
+</html>
