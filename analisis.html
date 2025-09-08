@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Análisis de Encuesta</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-zinc-900 text-white min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-zinc-800 p-4 shadow-md flex justify-between items-center">
+    <h1 class="text-lg md:text-xl font-bold">Análisis de Encuesta</h1>
+    <button onclick="exportar()" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm font-semibold">Exportar</button>
+  </header>
+
+  <!-- Dashboard -->
+  <main class="flex-1 p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+    
+    <!-- Card de info -->
+    <div class="bg-zinc-800 p-6 rounded-2xl shadow-lg">
+      <h2 class="text-lg opacity-80 mb-2">Materia</h2>
+      <p id="materia" class="text-2xl font-bold text-blue-400">-</p>
+      <p id="fecha" class="text-gray-400 text-sm mt-1"></p>
+    </div>
+
+    <!-- Card de respuestas -->
+    <div class="bg-zinc-800 p-6 rounded-2xl shadow-lg">
+      <h2 class="text-lg opacity-80 mb-2">Respuestas Totales</h2>
+      <p id="total" class="text-4xl font-bold text-green-400">0</p>
+    </div>
+
+    <!-- Gráfico de barras -->
+    <div class="bg-zinc-800 p-6 rounded-2xl shadow-lg col-span-1 md:col-span-2">
+      <h2 class="text-lg font-semibold mb-4">Respuestas por Pregunta</h2>
+      <canvas id="barChart" height="120"></canvas>
+    </div>
+
+    <!-- Gráfico circular -->
+    <div class="bg-zinc-800 p-6 rounded-2xl shadow-lg col-span-1 md:col-span-2">
+      <h2 class="text-lg font-semibold mb-4">Distribución de Respuestas</h2>
+      <canvas id="pieChart" height="120"></canvas>
+    </div>
+  </main>
+
+  <script>
+    // Recuperar datos
+    const materia = localStorage.getItem("materiaSeleccionada") || "Sin materia";
+    const fecha = new Date().toLocaleDateString("es-AR");
+    const respuestas = JSON.parse(localStorage.getItem("respuestas")) || [];
+    const preguntas = JSON.parse(localStorage.getItem("preguntas")) || [];
+
+    document.getElementById("materia").innerText = materia;
+    document.getElementById("fecha").innerText = "Fecha: " + fecha;
+    document.getElementById("total").innerText = respuestas.length;
+
+    // Contar respuestas por tipo
+    const conteo = { "Si": 0, "No": 0, "Más o menos": 0 };
+    respuestas.forEach(r => conteo[r] = (conteo[r] || 0) + 1);
+
+    // Gráfico de barras (por pregunta)
+    const ctxBar = document.getElementById("barChart").getContext("2d");
+    new Chart(ctxBar, {
+      type: "bar",
+      data: {
+        labels: preguntas,
+        datasets: [{
+          label: "Respuestas (Sí)",
+          data: preguntas.map((_, i) => respuestas[i] === "Si" ? 1 : 0),
+          backgroundColor: "#3b82f6"
+        },{
+          label: "Respuestas (No)",
+          data: preguntas.map((_, i) => respuestas[i] === "No" ? 1 : 0),
+          backgroundColor: "#ef4444"
+        },{
+          label: "Respuestas (Más o menos)",
+          data: preguntas.map((_, i) => respuestas[i] === "Más o menos" ? 1 : 0),
+          backgroundColor: "#eab308"
+        }]
+      },
+      options: { responsive: true, plugins: { legend: { labels: { color: "#fff" } } }, scales: { x: { ticks: { color: "#fff" } }, y: { ticks: { color: "#fff", precision:0 } } } }
+    });
+
+    // Gráfico circular (resumen total)
+    const ctxPie = document.getElementById("pieChart").getContext("2d");
+    new Chart(ctxPie, {
+      type: "pie",
+      data: {
+        labels: Object.keys(conteo),
+        datasets: [{
+          data: Object.values(conteo),
+          backgroundColor: ["#3b82f6","#ef4444","#eab308"]
+        }]
+      },
+      options: { responsive: true, plugins: { legend: { labels: { color: "#fff" } } } }
+    });
+
+    // Exportar resultados
+    function exportar() {
+      const data = { materia, fecha, respuestas };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "resultados.json";
+      link.click();
+    }
+  </script>
+</body>
+</html>

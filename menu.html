@@ -5,15 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Seleccionar Materia</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 </head>
-<body class="bg-zinc-900 min-h-screen flex items-center justify-center px-4 font-sans">
+<body class="bg-gradient-to-br from-zinc-900 to-zinc-950 min-h-screen flex items-center justify-center px-4 font-sans overflow-hidden">
 
-  <main class="bg-zinc-800 text-white p-8 rounded-3xl shadow-xl w-full max-w-xl space-y-6">
+  <main id="form-card" class="bg-zinc-800/90 backdrop-blur-xl text-white p-8 rounded-3xl shadow-2xl w-full max-w-xl space-y-6 border border-zinc-700/40">
     <h1 class="text-3xl font-bold text-center opacity-90">Formulario de Materias</h1>
 
     <div>
       <label for="materias" class="block mb-2 text-lg">Selecciona una materia:</label>
-      <select id="materias" class="w-full p-3 rounded bg-zinc-700 text-white" onchange="actualizarDocente()">
+      <select id="materias" class="w-full p-3 rounded-xl bg-zinc-700 text-white focus:ring-2 focus:ring-blue-500 transition" onchange="actualizarDocente()">
         <option value="">-- Elige una materia --</option>
         <option value="Matemáticas aplicadas">Matemáticas aplicadas</option>
         <option value="Lengua y Literatura">Lengua y Literatura</option>
@@ -30,15 +31,15 @@
 
     <div>
       <label for="docente" class="block mb-2 text-lg">Docente asignado:</label>
-      <input type="text" id="docente" class="w-full p-3 rounded bg-zinc-700 text-white" readonly />
+      <input type="text" id="docente" class="w-full p-3 rounded-xl bg-zinc-700 text-white focus:ring-2 focus:ring-blue-500 transition" readonly />
     </div>
 
     <div>
       <label for="temas" class="block mb-2 text-lg">Temas curriculares:</label>
-      <textarea id="temas" class="w-full p-3 rounded bg-zinc-700 text-white" rows="4" placeholder="Escribe los temas..."></textarea>
+      <textarea id="temas" class="w-full p-3 rounded-xl bg-zinc-700 text-white focus:ring-2 focus:ring-blue-500 transition" rows="4" placeholder="Escribe los temas..."></textarea>
     </div>
 
-    <button onclick="irASiguiente()" class="w-full bg-blue-600 hover:bg-blue-700 p-3 rounded text-white font-semibold">
+    <button onclick="irASiguiente()" class="w-full bg-blue-600 hover:bg-blue-500 p-3 rounded-xl text-white font-semibold shadow-lg transition transform hover:scale-105">
       Siguiente
     </button>
   </main>
@@ -68,14 +69,32 @@
       const docente = document.getElementById('docente').value;
       const temas = document.getElementById('temas').value;
 
-      // Guardamos los datos en localStorage (u otra forma de pasar datos)
       localStorage.setItem('materiaSeleccionada', materia);
       localStorage.setItem('docenteAsignado', docente);
       localStorage.setItem('temasCurriculares', temas);
 
-      // Redirigimos a la siguiente página
-      window.location.href = 'materia.html'; // cambia el nombre según tu archivo real
+      // Animación de salida antes de redirigir
+      gsap.to("#form-card", {
+        opacity: 0,
+        y: -50,
+        scale: 0.95,
+        duration: 0.8,
+        ease: "power2.inOut",
+        onComplete: () => {
+          window.location.href = "materia.html"; // cambia según tu archivo real
+        }
+      });
     }
+
+    // Animación de entrada al cargar
+    document.addEventListener("DOMContentLoaded", () => {
+      gsap.from("#form-card", {
+        opacity: 0,
+        y: 50,
+        duration: 1,
+        ease: "power3.out"
+      });
+    });
   </script>
 
 </body>
